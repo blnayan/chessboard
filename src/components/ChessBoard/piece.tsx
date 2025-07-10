@@ -71,9 +71,7 @@ export function Piece({
     const { x, y } = getSquareCoordinates(square);
     const toFile = x + Math.round(translateX / pieceSize);
     const toRank = y + Math.round(translateY / pieceSize);
-    console.log(toFile, toRank);
     const toSquare = getSquareFromCoordinates(toFile, toRank);
-    console.log("toSquare", toSquare);
 
     if (handleMove(square, toSquare, "q")) {
       setPieceState((prev) => ({
