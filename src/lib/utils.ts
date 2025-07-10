@@ -1,0 +1,73 @@
+import { Square, SQUARES } from "chess.js";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+const fileStyle: Record<string, string> = {
+  a: "left-0",
+  b: "left-1/8",
+  c: "left-2/8",
+  d: "left-3/8",
+  e: "left-4/8",
+  f: "left-5/8",
+  g: "left-6/8",
+  h: "left-7/8",
+};
+
+const rankStyle: Record<string, string> = {
+  "8": "top-0",
+  "7": "top-1/8",
+  "6": "top-2/8",
+  "5": "top-3/8",
+  "4": "top-4/8",
+  "3": "top-5/8",
+  "2": "top-6/8",
+  "1": "top-7/8",
+};
+
+const fileNumber: Record<string, number> = {
+  a: 0,
+  b: 1,
+  c: 2,
+  d: 3,
+  e: 4,
+  f: 5,
+  g: 6,
+  h: 7,
+};
+
+const rankNumber: Record<string, number> = {
+  "8": 0,
+  "7": 1,
+  "6": 2,
+  "5": 3,
+  "4": 4,
+  "3": 5,
+  "2": 6,
+  "1": 7,
+};
+
+const fileNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
+const rankNames = ["8", "7", "6", "5", "4", "3", "2", "1"];
+
+export function getSquareCoordinates(square: Square) {
+  const x = fileNumber[square.charAt(0)];
+  const y = rankNumber[square.charAt(1)];
+  return { x, y };
+}
+
+export function getSquareFromCoordinates(x: number, y: number): Square {
+  if (x < 0 || x > 7 || y < 0 || y > 7) {
+    throw new Error("Coordinates out of bounds");
+  }
+  const file = fileNames[x];
+  const rank = rankNames[y];
+  return `${file}${rank}` as Square;
+}
+
+export function getPiecePositionStyle(square: Square) {
+  return `${fileStyle[square.charAt(0)]} ${rankStyle[square.charAt(1)]}`;
+}
