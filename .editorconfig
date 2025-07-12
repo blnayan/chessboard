@@ -1,3 +1,3 @@
-[*.{js,ts,jsx,tsx}]
+[*.{js,ts,jsx,tsx,json}]
 indent_style = space
 indent_size = 2
