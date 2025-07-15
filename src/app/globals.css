@@ -137,4 +137,7 @@
   .left-5\/8 { left: 62.5%; }
   .left-6\/8 { left: 75%; }
   .left-7\/8 { left: 87.5%; }
+
+  .width-1\/8 { width: 12.5%; }
+  .height-1\/8 { height: 12.5%; }
 }

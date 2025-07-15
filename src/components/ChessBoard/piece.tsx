@@ -18,6 +18,9 @@ export interface PieceProps {
     to: Square,
     promotion?: Exclude<PieceSymbol, "p" | "k">
   ) => boolean;
+  disableBoard: boolean;
+  playerColor: Color;
+  inCheck: Color | null;
   chess: Chess;
 }
 
@@ -42,8 +45,12 @@ export function Piece({
   color,
   boardSize,
   handleMove,
+  disableBoard,
+  playerColor,
+  inCheck,
   chess,
 }: PieceProps) {
+  const flipped = playerColor === "b";
   const [dragState, setDragState] = useState<DragState>({
     translateX: 0,
     translateY: 0,
@@ -68,12 +75,12 @@ export function Piece({
   useEffect(() => {
     if (!moved) return;
 
-    const { x, y } = getSquareCoordinates(square);
+    const { x, y } = getSquareCoordinates(square, flipped);
     const toFile = x + Math.round(translateX / pieceSize);
     const toRank = y + Math.round(translateY / pieceSize);
-    const toSquare = getSquareFromCoordinates(toFile, toRank);
+    const toSquare = getSquareFromCoordinates(toFile, toRank, flipped);
 
-    if (handleMove(square, toSquare, "q")) {
+    if (toSquare && handleMove(square, toSquare, "q")) {
       setPieceState((prev) => ({
         ...prev,
         legalMoves: [],
@@ -102,6 +109,9 @@ export function Piece({
   }
 
   function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    if (disableBoard) return; // Prevent dragging if the board is disabled
+    if (playerColor !== color) return; // Prevent dragging if it's not the player's turn
+    if (chess.turn() !== playerColor) return;
     if (event.button !== 0) return; // Only handle left mouse button
 
     const { clientX, clientY, nativeEvent } = event;
@@ -158,11 +168,61 @@ export function Piece({
       dragging: false,
       moved: true,
     }));
+    setPieceState(pieceState);
   }
 
   function handleBlur() {
     removeDraggingListeners();
     setDragState(dragState);
+    setPieceState(pieceState);
+  }
+
+  function highlightLegalMoves() {
+    return legalMoves.map((move, index) => {
+      const { x, y } = getSquareCoordinates(square, flipped);
+      const toFile = x + Math.round(translateX / pieceSize);
+      const toRank = y + Math.round(translateY / pieceSize);
+      const toSquare = getSquareFromCoordinates(toFile, toRank, flipped);
+
+      return (
+        <div
+          key={index}
+          className={`absolute ${getPiecePositionStyle(
+            move.to,
+            flipped
+          )} size-1/8 flex justify-center items-center overflow-hidden`}
+        >
+          {move.isCapture() ? (
+            <div
+              className={
+                toSquare === move.to
+                  ? "bg-black/30 size-full"
+                  : "size-full shadow-[0_0_0_100px_#0000004D] rounded-[40%]"
+              }
+            />
+          ) : (
+            <div
+              className={
+                toSquare === move.to
+                  ? "bg-black/30 size-full"
+                  : "size-1/3 bg-black/30 rounded-full"
+              }
+            />
+          )}
+        </div>
+      );
+    });
+  }
+
+  function highlightKingWhenInCheck() {
+    return inCheck && inCheck === color && type === "k" ? (
+      <div
+        className={`absolute ${getPiecePositionStyle(
+          square,
+          flipped
+        )} size-1/8 bg-radial from-red-600 to-transparent `}
+      />
+    ) : null;
   }
 
   return (
@@ -170,20 +230,24 @@ export function Piece({
       <div
         style={{
           transform: `translate(${translateX}px, ${translateY}px)`,
+          zIndex: dragging ? 20 : 10,
+          cursor: dragging ? "grabbing" : "grab",
         }}
-        className={`absolute ${getPiecePositionStyle(square)} ${
-          dragging ? "z-10" : ""
-        }`}
+        className={`absolute ${getPiecePositionStyle(
+          square,
+          flipped
+        )} size-1/8`}
         onMouseDown={handleMouseDown}
       >
         <Image
           src={`/piece/cburnett/${color}${type}.svg`}
           alt={`${color}${type}`}
-          width={boardSize / 8}
-          height={boardSize / 8}
           draggable={false}
+          fill
         />
       </div>
+      {highlightKingWhenInCheck()}
+      {highlightLegalMoves()}
     </>
   );
 }

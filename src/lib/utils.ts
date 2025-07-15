@@ -17,6 +17,17 @@ const fileStyle: Record<string, string> = {
   h: "left-7/8",
 };
 
+const fileFlippedStyle: Record<string, string> = {
+  a: "right-0",
+  b: "right-1/8",
+  c: "right-2/8",
+  d: "right-3/8",
+  e: "right-4/8",
+  f: "right-5/8",
+  g: "right-6/8",
+  h: "right-7/8",
+};
+
 const rankStyle: Record<string, string> = {
   "8": "top-0",
   "7": "top-1/8",
@@ -26,6 +37,17 @@ const rankStyle: Record<string, string> = {
   "3": "top-5/8",
   "2": "top-6/8",
   "1": "top-7/8",
+};
+
+const rankFlippedStyle: Record<string, string> = {
+  "8": "bottom-0",
+  "7": "bottom-1/8",
+  "6": "bottom-2/8",
+  "5": "bottom-3/8",
+  "4": "bottom-4/8",
+  "3": "bottom-5/8",
+  "2": "bottom-6/8",
+  "1": "bottom-7/8",
 };
 
 const fileNumber: Record<string, number> = {
@@ -53,21 +75,37 @@ const rankNumber: Record<string, number> = {
 const fileNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
 const rankNames = ["8", "7", "6", "5", "4", "3", "2", "1"];
 
-export function getSquareCoordinates(square: Square) {
+export function getSquareCoordinates(square: Square, flipped = false) {
   const x = fileNumber[square.charAt(0)];
   const y = rankNumber[square.charAt(1)];
+
+  if (flipped) return { x: 7 - x, y: 7 - y };
   return { x, y };
 }
 
-export function getSquareFromCoordinates(x: number, y: number): Square {
+export function getSquareFromCoordinates(
+  x: number,
+  y: number,
+  flipped = false
+): Square | null {
   if (x < 0 || x > 7 || y < 0 || y > 7) {
-    throw new Error("Coordinates out of bounds");
+    return null; // Invalid square
   }
+
+  if (flipped) {
+    x = 7 - x; // Flip the x-coordinate
+    y = 7 - y; // Flip the y-coordinate
+  }
+
   const file = fileNames[x];
   const rank = rankNames[y];
   return `${file}${rank}` as Square;
 }
 
-export function getPiecePositionStyle(square: Square) {
+export function getPiecePositionStyle(square: Square, flipped = false) {
+  if (flipped)
+    return `${fileFlippedStyle[square.charAt(0)]} ${
+      rankFlippedStyle[square.charAt(1)]
+    }`;
   return `${fileStyle[square.charAt(0)]} ${rankStyle[square.charAt(1)]}`;
 }

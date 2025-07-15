@@ -1,8 +1,10 @@
 "use client";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { Piece } from "./piece";
+import { socket, JoinRoomData, MoveData } from "@/lib/socket";
+import { useRouter } from "next/navigation";
 
 type Board = ({
   square: Square;
@@ -13,32 +15,99 @@ type Board = ({
 export interface BoardState {
   boardSize: number;
   board: Board;
+  disableBoard: boolean;
+  inCheck: Color | null;
 }
 
-const chess = new Chess();
+export interface ChessBoardProps {
+  roomId: string;
+  playerId: string;
+  color: Color;
+}
 
-export function ChessBoard() {
+export function ChessBoard(props: ChessBoardProps) {
+  const chess = useRef(new Chess()).current;
+  const router = useRouter();
   const [boardState, setBoardState] = useState<BoardState>({
     boardSize: 800,
     board: chess.board(),
+    disableBoard: true,
+    inCheck: null,
   });
-  const { boardSize, board } = boardState;
+  const { boardSize, board, disableBoard, inCheck } = boardState;
+  const { roomId, playerId, color } = props;
+
+  useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    const handleRoomJoined = (data: unknown) => {
+      JoinRoomData.parse(data);
+    };
+
+    const handleBothPlayersReady = () => {
+      setBoardState((prev) => ({ ...prev, disableBoard: false }));
+    };
+
+    const handleMoveMade = (move: unknown, moveColor: Color) => {
+      const parsedMove = MoveData.shape.move.parse(move);
+      if (color === moveColor) return;
+      chess.move(parsedMove);
+      setBoardState((prev) => ({
+        ...prev,
+        board: chess.board(),
+        inCheck: chess.inCheck() ? chess.turn() : null,
+      }));
+    };
+
+    const handleError = (message: string) => {
+      console.error("Socket error:", message);
+      router.push("/");
+    };
+
+    const handleDisconnect = () => {
+      router.push("/");
+    };
+
+    socket.on("roomJoined", handleRoomJoined);
+    socket.on("bothPlayersReady", handleBothPlayersReady);
+    socket.on("moveMade", handleMoveMade);
+    socket.on("error", handleError);
+    socket.on("disconnect", handleDisconnect);
+
+    socket.emit("joinRoom", { roomId, playerId, color });
+
+    return () => {
+      socket.off("roomJoined", handleRoomJoined);
+      socket.off("bothPlayersReady", handleBothPlayersReady);
+      socket.off("moveMade", handleMoveMade);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("error", handleError);
+      socket.disconnect();
+    };
+  }, [roomId, playerId, color]);
 
   const handleMove = useCallback(
     (from: Square, to: Square, promotion?: Exclude<PieceSymbol, "p" | "k">) => {
       try {
         chess.move({ from, to, promotion });
-        setBoardState((prevState) => ({
-          ...prevState,
+        setBoardState((prev) => ({
+          ...prev,
           board: chess.board(),
+          inCheck: chess.inCheck() ? chess.turn() : null,
         }));
+        socket.emit("move", {
+          roomId,
+          playerId,
+          move: { from, to, promotion },
+        });
         return true;
       } catch (error) {
-        console.error("Invalid move:", error);
         return false;
       }
     },
-    [chess]
+    []
   );
 
   function renderPieces() {
@@ -53,6 +122,9 @@ export function ChessBoard() {
             color={piece.color}
             boardSize={boardSize}
             handleMove={handleMove}
+            disableBoard={disableBoard}
+            playerColor={color}
+            inCheck={inCheck}
             chess={chess}
           />
         );
