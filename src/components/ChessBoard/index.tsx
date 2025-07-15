@@ -16,6 +16,7 @@ type Board = ({
 export interface BoardState {
   boardSize: number;
   board: Board;
+  roomExists: boolean;
   disableBoard: boolean;
   inCheck: Color | null;
 }
@@ -32,10 +33,11 @@ export function ChessBoard(props: ChessBoardProps) {
   const [boardState, setBoardState] = useState<BoardState>({
     boardSize: 800,
     board: chess.board(),
+    roomExists: false,
     disableBoard: true,
     inCheck: null,
   });
-  const { boardSize, board, disableBoard, inCheck } = boardState;
+  const { boardSize, board, roomExists, disableBoard, inCheck } = boardState;
   const { roomId, playerId, playerColor } = props;
 
   useEffect(() => {
@@ -45,6 +47,7 @@ export function ChessBoard(props: ChessBoardProps) {
 
     const handleRoomJoined = (data: unknown) => {
       JoinRoomData.parse(data);
+      setBoardState((prev) => ({ ...prev, roomExists: true }));
     };
 
     const handleBothPlayersReady = () => {
@@ -133,7 +136,7 @@ export function ChessBoard(props: ChessBoardProps) {
   }
 
   return (
-    <div>
+    roomExists && (
       <div className="relative">
         <Image
           className="rounded-md"
@@ -145,6 +148,6 @@ export function ChessBoard(props: ChessBoardProps) {
         />
         {renderPieces()}
       </div>
-    </div>
+    )
   );
 }
