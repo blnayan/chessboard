@@ -1,5 +1,6 @@
 import {
   getPiecePositionStyle,
+  getRoundingSide,
   getSquareCoordinates,
   getSquareFromCoordinates,
 } from "@/lib/utils";
@@ -20,6 +21,7 @@ export interface PieceProps {
   disableBoard: boolean;
   playerColor: Color;
   inCheck: Color | null;
+  turn: Color;
   chess: Chess;
 }
 
@@ -47,6 +49,7 @@ export function Piece({
   disableBoard,
   playerColor,
   inCheck,
+  turn,
   chess,
 }: PieceProps) {
   const flipped = playerColor === "b";
@@ -110,7 +113,7 @@ export function Piece({
   function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
     if (disableBoard) return; // Prevent dragging if the board is disabled
     if (playerColor !== color) return; // Prevent dragging if it's not the player's turn
-    if (chess.turn() !== playerColor) return;
+    if (turn !== playerColor) return;
     if (event.button !== 0) return; // Only handle left mouse button
 
     const { clientX, clientY, nativeEvent } = event;
@@ -189,14 +192,18 @@ export function Piece({
           className={`absolute ${getPiecePositionStyle(
             move.to,
             flipped
-          )} size-1/8 flex justify-center items-center overflow-hidden`}
+          )} size-1/8 flex justify-center items-center`}
         >
           {move.isCapture() ? (
             <div
               className={
                 toSquare === move.to
                   ? "bg-black/30 size-full"
-                  : "size-full shadow-[0_0_0_100px_#0000004D] rounded-[40%]"
+                  : `size-full bg-radial from-transparent from-79% to-black/30 to-80% ${getRoundingSide(
+                      move.to,
+                      "md",
+                      flipped
+                    )}`
               }
             />
           ) : (
@@ -230,7 +237,12 @@ export function Piece({
         style={{
           transform: `translate(${translateX}px, ${translateY}px)`,
           zIndex: dragging ? 20 : 10,
-          cursor: dragging ? "grabbing" : "grab",
+          cursor:
+            disableBoard || playerColor !== color || turn !== playerColor
+              ? "default"
+              : dragging
+              ? "grabbing"
+              : "grab",
         }}
         className={`absolute ${getPiecePositionStyle(
           square,

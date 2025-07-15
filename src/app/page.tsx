@@ -24,7 +24,9 @@ export default function Home() {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <Button onClick={handleClick}>New Game</Button>
+      <Button onClick={handleClick} className="cursor-pointer">
+        New Game
+      </Button>
     </div>
   );
 }

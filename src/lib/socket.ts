@@ -29,7 +29,7 @@ interface ServerToClientEvents {
   roomJoined: (data: JoinRoomDataType) => void;
   bothPlayersReady: () => void;
   moveMade: (move: MoveDataType["move"], moveColor: Color) => void;
-  gameOver: (data: { winner?: Color }) => void;
+  gameOver: (data: { gameStatus: Color | "draw" }) => void;
 }
 
 interface ClientToServerEvents {

@@ -104,11 +104,25 @@ export function getSquareFromCoordinates(
 }
 
 export function getPiecePositionStyle(square: Square, flipped = false) {
-  if (flipped)
+  if (flipped) {
     return `${fileFlippedStyle[square.charAt(0)]} ${
       rankFlippedStyle[square.charAt(1)]
     }`;
+  }
+
   return `${fileStyle[square.charAt(0)]} ${rankStyle[square.charAt(1)]}`;
+}
+
+export function getRoundingSide(square: Square, size = "md", flipped = false) {
+  if (square === "a8")
+    return flipped ? `rounded-br-${size}` : `rounded-tl-${size}`;
+  if (square === "a1")
+    return flipped ? `rounded-tr-${size}` : `rounded-bl-${size}`;
+  if (square === "h8")
+    return flipped ? `rounded-bl-${size}` : `rounded-tr-${size}`;
+  if (square === "h1")
+    return flipped ? `rounded-tl-${size}` : `rounded-br-${size}`;
+  return "";
 }
 
 export async function fetchData<T>(
