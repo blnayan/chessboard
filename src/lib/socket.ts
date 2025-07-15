@@ -2,7 +2,7 @@ import { Color } from "chess.js";
 import { io, Socket } from "socket.io-client";
 import * as z from "zod";
 
-const URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+const URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export const JoinRoomData = z.object({
   roomId: z.string(),

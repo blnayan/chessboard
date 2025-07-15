@@ -12,9 +12,12 @@ export default function Home() {
 
   const handleClick = async () => {
     const { roomId, playerId, playerColor } = await fetchData(
-      "http://localhost:4000/newgame",
+      `${
+        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
+      }/newgame`,
       JoinRoomData
     );
+
     const params = new URLSearchParams();
     params.set("roomId", roomId);
     params.set("playerId", playerId);
