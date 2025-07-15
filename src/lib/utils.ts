@@ -129,15 +129,15 @@ export async function fetchData<T>(
   url: string,
   schema: z.ZodType<T>
 ): Promise<T>;
-export async function fetchData(url: string): Promise<any>;
+export async function fetchData(url: string): Promise<unknown>;
 
 export async function fetchData<T>(
   url: string,
   schema?: z.ZodType<T>
-): Promise<T | any> {
+): Promise<T | unknown> {
   const response = await fetch(url);
   // Parse the response data
-  let data = await response.json(); // Or .text(), .blob(), etc.
+  const data = await response.json(); // Or .text(), .blob(), etc.
 
   if (schema) {
     return schema.parse(data);

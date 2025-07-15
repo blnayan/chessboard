@@ -96,6 +96,7 @@ export function Piece({
       dragging: false,
       moved: false,
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moved]);
 
   function addDraggingListeners() {
@@ -163,7 +164,7 @@ export function Piece({
     }));
   }
 
-  function handleMouseUp(event: MouseEvent) {
+  function handleMouseUp() {
     removeDraggingListeners();
     setDragState((prev) => ({
       ...prev,

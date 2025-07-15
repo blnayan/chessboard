@@ -128,6 +128,7 @@ export function ChessBoard(props: ChessBoardProps) {
       socket.off("error", handleError);
       socket.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, playerId, playerColor]);
 
   const handleMove = useCallback(
@@ -148,11 +149,11 @@ export function ChessBoard(props: ChessBoardProps) {
           move: { from, to, promotion },
         });
         return true;
-      } catch (error) {
+      } catch {
         return false;
       }
     },
-    [roomId, playerId]
+    [roomId, playerId, playerColor, chess]
   );
 
   function renderPieces() {

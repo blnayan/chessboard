@@ -1,8 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { fetchData } from "@/lib/utils";
 import { JoinRoomData } from "@/lib/socket";
