@@ -1,21 +1,25 @@
-"use client";
 import { ChessBoard } from "@/components/ChessBoard";
-import { Color } from "chess.js";
-import { useSearchParams } from "next/navigation";
+import { JoinRoomData } from "@/lib/socket";
+import { redirect } from "next/navigation";
 
-export default function Game({}) {
-  const searchParams = useSearchParams();
-  const roomId = searchParams.get("roomId");
-  const playerId = searchParams.get("playerId");
-  const playerColor = searchParams.get("playerColor");
+interface GameProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
 
-  if (!roomId || !playerId || !playerColor) {
-    return <div>Error: Missing game parameters.</div>;
-  }
+export default async function Game({ searchParams }: GameProps) {
+  const result = JoinRoomData.safeParse(await searchParams);
+
+  if (!result.success) redirect("/");
+
+  const { roomId, playerId, playerColor } = result.data;
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <ChessBoard roomId={roomId} playerId={playerId} playerColor={playerColor as Color} />
+      <ChessBoard
+        roomId={roomId}
+        playerId={playerId}
+        playerColor={playerColor}
+      />
     </div>
   );
 }
