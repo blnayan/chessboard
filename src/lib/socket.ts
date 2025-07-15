@@ -7,7 +7,7 @@ const URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
 export const JoinRoomData = z.object({
   roomId: z.string(),
   playerId: z.string(),
-  color: z.enum(["w", "b"]),
+  playerColor: z.enum(["w", "b"]),
 });
 
 export type JoinRoomDataType = z.infer<typeof JoinRoomData>;

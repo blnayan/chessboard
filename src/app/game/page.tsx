@@ -7,15 +7,15 @@ export default function Game() {
   const searchParams = useSearchParams();
   const roomId = searchParams.get("roomId");
   const playerId = searchParams.get("playerId");
-  const color = searchParams.get("color");
+  const playerColor = searchParams.get("color");
 
-  if (!roomId || !playerId || !color) {
+  if (!roomId || !playerId || !playerColor) {
     return <div>Error: Missing game parameters.</div>;
   }
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <ChessBoard roomId={roomId} playerId={playerId} color={color as Color} />
+      <ChessBoard roomId={roomId} playerId={playerId} playerColor={playerColor as Color} />
     </div>
   );
 }

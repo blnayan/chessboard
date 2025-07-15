@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
-import { Piece } from "./piece";
+import { Piece } from "@/components/ChessBoard/Piece";
 import { socket, JoinRoomData, MoveData } from "@/lib/socket";
 import { useRouter } from "next/navigation";
 
@@ -22,7 +22,7 @@ export interface BoardState {
 export interface ChessBoardProps {
   roomId: string;
   playerId: string;
-  color: Color;
+  playerColor: Color;
 }
 
 export function ChessBoard(props: ChessBoardProps) {
@@ -35,7 +35,7 @@ export function ChessBoard(props: ChessBoardProps) {
     inCheck: null,
   });
   const { boardSize, board, disableBoard, inCheck } = boardState;
-  const { roomId, playerId, color } = props;
+  const { roomId, playerId, playerColor } = props;
 
   useEffect(() => {
     if (!socket.connected) {
@@ -52,7 +52,7 @@ export function ChessBoard(props: ChessBoardProps) {
 
     const handleMoveMade = (move: unknown, moveColor: Color) => {
       const parsedMove = MoveData.shape.move.parse(move);
-      if (color === moveColor) return;
+      if (playerColor === moveColor) return;
       chess.move(parsedMove);
       setBoardState((prev) => ({
         ...prev,
@@ -76,7 +76,7 @@ export function ChessBoard(props: ChessBoardProps) {
     socket.on("error", handleError);
     socket.on("disconnect", handleDisconnect);
 
-    socket.emit("joinRoom", { roomId, playerId, color });
+    socket.emit("joinRoom", { roomId, playerId, playerColor });
 
     return () => {
       socket.off("roomJoined", handleRoomJoined);
@@ -86,7 +86,7 @@ export function ChessBoard(props: ChessBoardProps) {
       socket.off("error", handleError);
       socket.disconnect();
     };
-  }, [roomId, playerId, color]);
+  }, [roomId, playerId, playerColor]);
 
   const handleMove = useCallback(
     (from: Square, to: Square, promotion?: Exclude<PieceSymbol, "p" | "k">) => {
@@ -123,7 +123,7 @@ export function ChessBoard(props: ChessBoardProps) {
             boardSize={boardSize}
             handleMove={handleMove}
             disableBoard={disableBoard}
-            playerColor={color}
+            playerColor={playerColor}
             inCheck={inCheck}
             chess={chess}
           />

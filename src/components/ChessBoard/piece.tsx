@@ -4,9 +4,8 @@ import {
   getSquareFromCoordinates,
 } from "@/lib/utils";
 import { Chess, Color, Move, PieceSymbol, Square } from "chess.js";
-import { transform } from "next/dist/build/swc/generated-native";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface PieceProps {
   square: Square;
