@@ -1,6 +1,7 @@
-import { Square, SQUARES } from "chess.js";
+import { Square } from "chess.js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import * as z from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -108,4 +109,25 @@ export function getPiecePositionStyle(square: Square, flipped = false) {
       rankFlippedStyle[square.charAt(1)]
     }`;
   return `${fileStyle[square.charAt(0)]} ${rankStyle[square.charAt(1)]}`;
+}
+
+export async function fetchData<T>(
+  url: string,
+  schema: z.ZodType<T>
+): Promise<T>;
+export async function fetchData(url: string): Promise<any>;
+
+export async function fetchData<T>(
+  url: string,
+  schema?: z.ZodType<T>
+): Promise<T | any> {
+  const response = await fetch(url);
+  // Parse the response data
+  let data = await response.json(); // Or .text(), .blob(), etc.
+
+  if (schema) {
+    return schema.parse(data);
+  }
+
+  return data;
 }

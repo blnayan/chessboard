@@ -5,6 +5,7 @@ import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { Piece } from "@/components/ChessBoard/Piece";
 import { socket, JoinRoomData, MoveData } from "@/lib/socket";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type Board = ({
   square: Square;
@@ -62,7 +63,6 @@ export function ChessBoard(props: ChessBoardProps) {
     };
 
     const handleError = (message: string) => {
-      console.error("Socket error:", message);
       router.push("/");
     };
 
