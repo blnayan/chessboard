@@ -204,7 +204,7 @@ export function ChessBoard(props: ChessBoardProps) {
           <div className="flex justify-center items-center">
             <LoadingSpinner />
           </div>
-          <DialogTitle className="text-center text-3xl">
+          <DialogTitle className="text-center text-xl">
             Waiting for an Opponent!
           </DialogTitle>
         </DialogContent>
@@ -216,7 +216,7 @@ export function ChessBoard(props: ChessBoardProps) {
     return (
       <Dialog open={typeof gameStatus === "string"}>
         <DialogContent showCloseButton={false}>
-          <DialogTitle className="text-center text-3xl">
+          <DialogTitle className="text-center text-xl">
             {gameStatus === "draw"
               ? "Draw"
               : gameStatus === "w"
